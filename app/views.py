@@ -1,6 +1,6 @@
 import os
 from app import app, db, login_manager
-from flask import render_template, request, redirect, url_for, flash, session, abort
+from flask import render_template, request, redirect, url_for, flash, session, abort, send_from_directory
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
@@ -75,6 +75,36 @@ def flash_errors(form):
                 getattr(form, field).label.text,
                 error
 ), 'danger')
+            
+
+# Helper function to get list of uploaded images
+def get_uploaded_images():
+    uploaded_files = []
+    upload_folder = app.config['UPLOAD_FOLDER']
+    
+    if not os.path.exists(upload_folder):
+        return uploaded_files  # Return empty list if folder doesn't exist
+
+    for file in os.listdir(upload_folder):
+        if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):  # Filter image files only
+            uploaded_files.append(file)
+    
+    return uploaded_files
+
+
+# Route to serve uploaded images
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+# Route to display list of uploaded images
+@app.route('/files')
+@login_required
+def files():
+    images = get_uploaded_images()
+    return render_template('files.html', images=images)
+
 
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):
