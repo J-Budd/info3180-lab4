@@ -86,7 +86,7 @@ def get_uploaded_images():
         return uploaded_files  # Return empty list if folder doesn't exist
 
     for file in os.listdir(upload_folder):
-        if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):  # Filter image files only
+        if file.lower().endswith(('.png', '.jpg', '.jpeg')):  # Filter image files only
             uploaded_files.append(file)
     
     return uploaded_files
